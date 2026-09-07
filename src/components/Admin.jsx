@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './Admin.css'
 
 const statuses = ['New', 'Contacted', 'Confirmed', 'Completed']
+const API_BASE = import.meta.env.VITE_API_URL || ''
 
 export default function Admin() {
   const [token, setToken] = useState(() => sessionStorage.getItem('abr_admin_token') || '')
@@ -11,7 +12,7 @@ export default function Admin() {
   const [selected, setSelected] = useState(null)
 
   const loadBookings = async (authToken = token) => {
-    const response = await fetch('/api/admin/bookings', { headers: { Authorization: `Bearer ${authToken}` } })
+    const response = await fetch(`${API_BASE}/api/admin/bookings`, { headers: { Authorization: `Bearer ${authToken}` } })
     if (!response.ok) throw new Error('Could not load bookings.')
     const data = await response.json()
     setBookings(data.bookings)
@@ -26,7 +27,7 @@ export default function Admin() {
   const login = async (event) => {
     event.preventDefault()
     setError('')
-    const response = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) })
+    const response = await fetch(`${API_BASE}/api/admin/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) })
     if (!response.ok) return setError('Incorrect password.')
     const data = await response.json()
     sessionStorage.setItem('abr_admin_token', data.token)
@@ -35,12 +36,12 @@ export default function Admin() {
   }
 
   const updateStatus = async (id, status) => {
-    await fetch(`/api/admin/bookings/${id}`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })
+    await fetch(`${API_BASE}/api/admin/bookings/${id}`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })
     loadBookings()
   }
 
   const removeBooking = async (id) => {
-    await fetch(`/api/admin/bookings/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
+    await fetch(`${API_BASE}/api/admin/bookings/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
     setSelected(null)
     loadBookings()
   }

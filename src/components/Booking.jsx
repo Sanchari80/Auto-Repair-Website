@@ -4,6 +4,7 @@ import './Booking.css'
 const SERVICES = ['Collision Repair', 'Paint & Refinish', 'Dent & Scratch', 'Detailing & Ceramic', 'Glass Replacement', 'Free Estimate']
 const TIMES = ['8:00 AM', '9:30 AM', '11:00 AM', '1:00 PM', '2:30 PM', '4:00 PM']
 const HISTORY_KEY = 'abr_session_history'
+const API_BASE = import.meta.env.VITE_API_URL || ''
 
 function getSavedHistory() {
   try {
@@ -62,7 +63,7 @@ export default function Booking({ open, onClose }) {
     const checkStatus = async () => {
       const nextHistory = await Promise.all(history.map(async (item) => {
         try {
-          const response = await fetch(`/api/bookings/${item.id}/status`)
+          const response = await fetch(`${API_BASE}/api/bookings/${item.id}/status`)
           if (!response.ok) return item
           const result = await response.json()
           return { ...item, status: result.status }
@@ -88,7 +89,7 @@ export default function Booking({ open, onClose }) {
 
   const submit = async () => {
     try {
-      const response = await fetch('/api/bookings', {
+      const response = await fetch(`${API_BASE}/api/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

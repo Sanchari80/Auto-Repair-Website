@@ -7,10 +7,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
 const port = process.env.PORT || 3001
 const adminPassword = process.env.ADMIN_PASSWORD || 'repair-admin-2026'
+const frontendOrigin = process.env.FRONTEND_ORIGIN || '*'
 const sessions = new Map()
 const bookings = []
 
 app.use(express.json())
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', frontendOrigin)
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
+  if (req.method === 'OPTIONS') return res.sendStatus(204)
+  next()
+})
 app.use(express.static(path.join(__dirname, 'dist')))
 
 function isAuthorized(req) {
