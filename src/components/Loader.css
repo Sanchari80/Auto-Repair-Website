@@ -1,0 +1,56 @@
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background:
+    radial-gradient(120% 80% at 50% 30%, #16161c 0%, #0a0a0c 70%);
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.loader--hide { opacity: 0; transform: scale(1.05); pointer-events: none; }
+
+.loader__stage { flex: 1; width: 100%; min-height: 0; }
+.loader__stage canvas { display: block; width: 100%; height: 100%; }
+
+.loader__ui {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 0 clamp(24px, 6vw, 90px) clamp(36px, 7vh, 70px);
+}
+
+.loader__brand {
+  font-family: var(--font-black), sans-serif;
+  font-size: clamp(1.4rem, 4vw, 2.6rem);
+  letter-spacing: -0.01em;
+  color: var(--steel-100);
+  line-height: 1;
+  margin-bottom: 20px;
+}
+.loader__brand span {
+  color: var(--heat-1);
+  margin-left: 10px;
+}
+
+.loader__bar {
+  height: 3px;
+  background: var(--graphite-600);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.loader__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--heat-1), var(--amber-1));
+  transition: width 0.3s var(--ease-out);
+  box-shadow: 0 0 16px var(--heat-1);
+}
+
+.loader__meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  font-size: 0.82rem;
+  color: var(--steel-400);
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+}

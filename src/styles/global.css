@@ -1,0 +1,85 @@
+/* ============================================================
+   Auto Body Repair Inc. — Design System
+   Aesthetic: industrial garage / molten steel. Dark graphite
+   base, heat-orange spark accent, brushed-steel neutrals.
+   Type: Archivo (wide grotesque headlines) + Inter (body).
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&family=Archivo+Black&display=swap');
+
+:root {
+  /* Core palette */
+  --graphite-900: #0a0a0c;
+  --graphite-800: #121216;
+  --graphite-700: #1a1a20;
+  --graphite-600: #24242c;
+  --steel-400: #6b6f78;
+  --steel-300: #9aa0ab;
+  --steel-100: #e6e8ec;
+
+  --heat-1: #ff5a1f;   /* molten orange */
+  --heat-2: #ff8a3d;   /* spark */
+  --amber-1: #f5c518;  /* caution yellow */
+  --cool-1: #35c0d8;   /* diagnostic cyan */
+
+  /* three.js adapter hex tokens (used by opening animation) */
+  --hex-orange-1: #ff5a1f;
+  --hex-citrus-1: #f5c518;
+  --hex-green-1: #35c0d8;
+  --hex-current-1: #ff5a1f;
+  --hex-current-3: #24242c;
+
+  --font-display: 'Archivo', system-ui, sans-serif;
+  --font-black: 'Archivo Black', 'Archivo', sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  --maxw: 1240px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--graphite-900);
+  color: var(--steel-100);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, video { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+ul { list-style: none; }
+
+h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
+
+.wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+section { position: relative; }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--heat-2);
+}
+.eyebrow::before { content: ''; width: 26px; height: 2px; background: var(--heat-1); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
+::selection { background: var(--heat-1); color: #fff; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--graphite-900); }
+::-webkit-scrollbar-thumb { background: var(--graphite-600); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--heat-1); }
