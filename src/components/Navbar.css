@@ -81,7 +81,6 @@
 .nav__burger.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 @media (max-width: 900px) {
-  .nav { background: rgba(10, 10, 12, 0.96); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08); }
   .nav__inner { height: 68px; }
   .nav__phone { display: none; }
   .nav__burger { display: flex; }
