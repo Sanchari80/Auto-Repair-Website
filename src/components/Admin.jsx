@@ -9,6 +9,7 @@ export default function Admin() {
   const [token, setToken] = useState(() => sessionStorage.getItem('abr_admin_token') || '')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
   const [bookings, setBookings] = useState([])
   const [selected, setSelected] = useState(null)
 
@@ -34,12 +35,27 @@ export default function Admin() {
   const login = async (event) => {
     event.preventDefault()
     setError('')
-    const response = await fetch(`${API_BASE}/api/admin/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) })
-    if (!response.ok) return setError('Incorrect password.')
-    const data = await response.json()
-    sessionStorage.setItem('abr_admin_token', data.token)
-    setToken(data.token)
-    setPassword('')
+    setIsLoggingIn(true)
+    try {
+      const controller = new AbortController()
+      const timeout = window.setTimeout(() => controller.abort(), 8000)
+      const response = await fetch(`${API_BASE}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+        signal: controller.signal,
+      })
+      window.clearTimeout(timeout)
+      if (!response.ok) return setError(response.status === 401 ? 'Incorrect password.' : 'Admin service is unavailable.')
+      const data = await response.json()
+      sessionStorage.setItem('abr_admin_token', data.token)
+      setToken(data.token)
+      setPassword('')
+    } catch {
+      setError('Could not connect to the admin service. Please try again shortly.')
+    } finally {
+      setIsLoggingIn(false)
+    }
   }
 
   const updateStatus = async (id, status) => {
@@ -62,7 +78,7 @@ export default function Admin() {
         <p>Sign in to review incoming session requests.</p>
         <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoFocus required /></label>
         {error && <span className="admin-error">{error}</span>}
-        <button className="btn btn--primary" type="submit">Open bookings</button>
+        <button className="btn btn--primary" type="submit" disabled={isLoggingIn}>{isLoggingIn ? 'Connecting...' : 'Open bookings'}</button>
         <a href="/" className="admin-back">Back to website</a>
       </form>
     </main>
