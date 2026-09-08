@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || ''
+const API_BASE = import.meta.env.VITE_API_URL || 'https://auto-repair-website.onrender.com'
 
 function socketUrl() {
   if (API_BASE) return API_BASE.replace(/^http/, 'ws') + '/ws'

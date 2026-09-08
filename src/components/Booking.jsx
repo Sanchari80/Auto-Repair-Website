@@ -5,7 +5,7 @@ import { subscribeToBookingEvents } from '../utils/bookingSocket.js'
 const SERVICES = ['Collision Repair', 'Paint & Refinish', 'Dent & Scratch', 'Detailing & Ceramic', 'Glass Replacement', 'Free Estimate']
 const TIMES = ['8:00 AM', '9:30 AM', '11:00 AM', '1:00 PM', '2:30 PM', '4:00 PM']
 const HISTORY_KEY = 'abr_session_history'
-const API_BASE = import.meta.env.VITE_API_URL || ''
+const API_BASE = import.meta.env.VITE_API_URL || 'https://auto-repair-website.onrender.com'
 
 function getSavedHistory() {
   try {

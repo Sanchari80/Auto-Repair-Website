@@ -49,6 +49,12 @@ The frontend is Vite and the booking/admin API is Express. They can be deployed 
 3. Point frontend `/api` requests to the backend URL in production.
 4. Set `ADMIN_PASSWORD` on the backend host.
 
+For the current deployment, the frontend is `https://auto-repair-website-two.vercel.app/`
+and the Express backend is `https://auto-repair-website.onrender.com`. The frontend
+uses the Render URL as its production fallback. You can override it with the Vercel
+environment variable `VITE_API_URL` if the backend URL changes. The booking WebSocket
+automatically uses the same backend URL with `wss://` on HTTPS deployments.
+
 **Vercel frontend CLI**
 ```bash
 npm i -g vercel

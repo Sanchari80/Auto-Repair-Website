@@ -3,7 +3,7 @@ import './Admin.css'
 import { subscribeToBookingEvents } from '../utils/bookingSocket.js'
 
 const statuses = ['New', 'Contacted', 'Confirmed', 'Completed']
-const API_BASE = import.meta.env.VITE_API_URL || ''
+const API_BASE = import.meta.env.VITE_API_URL || 'https://auto-repair-website.onrender.com'
 
 export default function Admin() {
   const [token, setToken] = useState(() => sessionStorage.getItem('abr_admin_token') || '')
