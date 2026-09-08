@@ -7,6 +7,9 @@
 .admin-login p, .admin-heading p { color: var(--steel-400); }
 .admin-login label, .admin-detail label { display: grid; gap: 8px; margin: 28px 0 18px; color: var(--steel-300); font-size: .85rem; }
 .admin-login input, .admin-detail select { width: 100%; padding: 13px; background: var(--graphite-900); border: 1px solid rgba(255,255,255,.16); border-radius: 3px; color: #fff; font: inherit; }
+.admin-password > div { position: relative; display: flex; align-items: center; }
+.admin-password input { padding-right: 62px; }
+.admin-password button { position: absolute; right: 12px; color: var(--heat-2); font-size: .75rem; font-weight: 700; }
 .admin-login input:focus, .admin-detail select:focus { outline: none; border-color: var(--heat-1); }
 .admin-error { display: block; margin-bottom: 16px; color: #ff8a3d; font-size: .88rem; }
 .admin-login .btn { width: 100%; justify-content: center; }
@@ -17,6 +20,8 @@
 .admin-shell { width: min(1240px, 100%); margin: 0 auto; padding: clamp(36px, 7vw, 80px) 24px; }
 .admin-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 36px; }
 .admin-heading h1 { margin: 16px 0 10px; font-size: clamp(2.2rem, 5vw, 4rem); }
+.admin-notice { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 20px; padding: 13px 16px; color: var(--steel-100); background: rgba(53,192,216,.1); border: 1px solid rgba(53,192,216,.4); border-left: 3px solid var(--cool-1); }
+.admin-notice button { color: var(--steel-300); font-size: 1.2rem; }
 .admin-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
 .admin-stats div { padding: 22px; background: var(--graphite-800); border: 1px solid rgba(255,255,255,.08); border-radius: 4px; }
 .admin-stats strong { display: block; color: var(--heat-2); font: 800 2rem var(--font-display); }

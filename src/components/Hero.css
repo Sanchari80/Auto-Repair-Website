@@ -148,7 +148,7 @@
 
 @media (max-width: 640px) {
   .hero { align-items: flex-start; }
-  .hero__content { padding-top: 124px; padding-bottom: 48px; }
+  .hero__content { padding-top: 142px; padding-bottom: 48px; }
   .hero__stats { gap: 26px; }
   .hero__scroll { display: none; }
 }
