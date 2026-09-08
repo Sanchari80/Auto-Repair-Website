@@ -1,7 +1,9 @@
 import express from 'express'
+import http from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import crypto from 'node:crypto'
+import { WebSocketServer } from 'ws'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -10,6 +12,8 @@ const adminPassword = process.env.ADMIN_PASSWORD || 'repair-admin-2026'
 const frontendOrigin = process.env.FRONTEND_ORIGIN || '*'
 const sessions = new Map()
 const bookings = []
+const server = http.createServer(app)
+const webSocketServer = new WebSocketServer({ noServer: true })
 
 app.use(express.json())
 app.use((req, res, next) => {
@@ -20,6 +24,20 @@ app.use((req, res, next) => {
   next()
 })
 app.use(express.static(path.join(__dirname, 'dist')))
+
+server.on('upgrade', (request, socket, head) => {
+  if (request.url !== '/ws') return socket.destroy()
+  webSocketServer.handleUpgrade(request, socket, head, (client) => {
+    webSocketServer.emit('connection', client, request)
+  })
+})
+
+function broadcast(event) {
+  const message = JSON.stringify(event)
+  webSocketServer.clients.forEach((client) => {
+    if (client.readyState === 1) client.send(message)
+  })
+}
 
 function isAuthorized(req) {
   const token = req.headers.authorization?.replace('Bearer ', '')
@@ -36,6 +54,7 @@ app.post('/api/bookings', (req, res) => {
     status: 'New', createdAt: new Date().toISOString(),
   }
   bookings.unshift(booking)
+  broadcast({ type: 'booking.created', booking })
   res.status(201).json({ booking: { id: booking.id, status: booking.status } })
 })
 
@@ -62,6 +81,7 @@ app.patch('/api/admin/bookings/:id', (req, res) => {
   const booking = bookings.find((item) => item.id === req.params.id)
   if (!booking) return res.status(404).json({ message: 'Booking not found.' })
   if (['New', 'Contacted', 'Confirmed', 'Completed'].includes(req.body?.status)) booking.status = req.body.status
+  broadcast({ type: 'booking.updated', booking })
   res.json({ booking })
 })
 
@@ -70,10 +90,11 @@ app.delete('/api/admin/bookings/:id', (req, res) => {
   const index = bookings.findIndex((item) => item.id === req.params.id)
   if (index === -1) return res.status(404).json({ message: 'Booking not found.' })
   bookings.splice(index, 1)
+  broadcast({ type: 'booking.deleted', bookingId: req.params.id })
   res.status(204).end()
 })
 
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'dist', 'index.html')))
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'dist', 'index.html')))
 
-app.listen(port, () => console.log(`Auto Body Repair server running on http://localhost:${port}`))
+server.listen(port, () => console.log(`Auto Body Repair server running on http://localhost:${port}`))

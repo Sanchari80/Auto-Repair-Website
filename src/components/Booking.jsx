@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './Booking.css'
+import { subscribeToBookingEvents } from '../utils/bookingSocket.js'
 
 const SERVICES = ['Collision Repair', 'Paint & Refinish', 'Dent & Scratch', 'Detailing & Ceramic', 'Glass Replacement', 'Free Estimate']
 const TIMES = ['8:00 AM', '9:30 AM', '11:00 AM', '1:00 PM', '2:30 PM', '4:00 PM']
@@ -78,6 +79,16 @@ export default function Booking({ open, onClose }) {
     const timer = setInterval(checkStatus, 3000)
     return () => clearInterval(timer)
   }, [open, history.length, bookingId])
+
+  useEffect(() => subscribeToBookingEvents((event) => {
+    if (event.type !== 'booking.updated') return
+    setHistory((current) => {
+      const next = current.map((item) => item.id === event.booking.id ? { ...item, status: event.booking.status } : item)
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(next))
+      return next
+    })
+    if (event.booking.id === bookingId) setBookingStatus(event.booking.status)
+  }), [bookingId])
 
   if (!open) return null
 

@@ -133,9 +133,17 @@
 .bk__history-row b.is-approved { color: #75d69b; }
 
 @media (max-width: 780px) {
+  .bk { padding: 12px; }
   .bk__panel { grid-template-columns: 1fr; }
   .bk__side { display: none; }
   .bk__main { padding: 46px 26px 30px; }
   .bk__days { grid-template-columns: repeat(3, 1fr); }
   .bk__fields { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 420px) {
+  .bk__main { padding: 46px 16px 22px; }
+  .bk__chips { gap: 7px; }
+  .bk__chip { padding: 10px 12px; font-size: .84rem; }
+  .bk__day { padding: 10px 2px; }
 }

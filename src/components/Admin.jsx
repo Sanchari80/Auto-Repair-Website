@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './Admin.css'
+import { subscribeToBookingEvents } from '../utils/bookingSocket.js'
 
 const statuses = ['New', 'Contacted', 'Confirmed', 'Completed']
 const API_BASE = import.meta.env.VITE_API_URL || ''
@@ -23,6 +24,12 @@ export default function Admin() {
     if (!token) return
     loadBookings().catch(() => { sessionStorage.removeItem('abr_admin_token'); setToken('') })
   }, [token])
+
+  useEffect(() => subscribeToBookingEvents((event) => {
+    if (event.type === 'booking.created' || event.type === 'booking.updated' || event.type === 'booking.deleted') {
+      loadBookings().catch(() => {})
+    }
+  }), [token])
 
   const login = async (event) => {
     event.preventDefault()

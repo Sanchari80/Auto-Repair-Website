@@ -78,6 +78,24 @@ section { position: relative; }
 
 ::selection { background: var(--heat-1); color: #fff; }
 
+.user-status {
+  position: fixed; right: 22px; bottom: 22px; z-index: 850;
+  display: flex; align-items: center; gap: 11px; max-width: min(360px, calc(100vw - 32px));
+  padding: 12px 14px; color: var(--steel-100); background: rgba(18,18,22,.95);
+  border: 1px solid rgba(53,192,216,.45); border-left: 3px solid var(--cool-1);
+  box-shadow: 0 12px 35px rgba(0,0,0,.35); backdrop-filter: blur(12px);
+}
+.user-status__pulse { width: 9px; height: 9px; flex: 0 0 auto; border-radius: 50%; background: var(--cool-1); box-shadow: 0 0 0 5px rgba(53,192,216,.14); }
+.user-status span:not(.user-status__pulse) { display: grid; gap: 2px; min-width: 0; }
+.user-status strong { font: 700 .78rem var(--font-display); text-transform: uppercase; letter-spacing: .06em; }
+.user-status small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--steel-300); font-size: .72rem; }
+.user-status button { flex: 0 0 auto; color: var(--heat-2); font-size: .76rem; font-weight: 700; }
+.user-status--confirmed { border-left-color: var(--heat-2); }.user-status--confirmed .user-status__pulse { background: var(--heat-2); }.user-status--contacted { border-left-color: var(--amber-1); }.user-status--contacted .user-status__pulse { background: var(--amber-1); }
+
+@media (max-width: 480px) {
+  .user-status { right: 12px; bottom: 12px; max-width: calc(100vw - 24px); }
+}
+
 /* scrollbar */
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--graphite-900); }
