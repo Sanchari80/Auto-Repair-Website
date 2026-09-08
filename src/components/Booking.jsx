@@ -30,7 +30,20 @@ function nextDays(count) {
 }
 
 function displayStatus(status) {
-  return status === 'New' ? 'Booked' : status
+  return status === 'New' ? 'Requested' : status
+}
+
+function downloadHistory(items) {
+  const columns = ['id', 'status', 'service', 'date', 'time', 'name', 'phone', 'vehicle', 'notes']
+  const cell = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`
+  const csv = [columns.join(','), ...items.map((item) => columns.map((column) => cell(item[column])).join(','))].join('\n')
+  const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `my-booking-history-${new Date().toISOString().slice(0, 10)}.csv`
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 export default function Booking({ open, onClose }) {
@@ -168,7 +181,7 @@ export default function Booking({ open, onClose }) {
               <h3>{bookingStatus === 'Confirmed' ? 'Booking confirmed' : 'Session requested'}</h3>
               <p>Thanks, {data.name.split(' ')[0] || 'there'}. We've noted your <strong>{data.service}</strong> for <strong>{data.date}</strong> at <strong>{data.time}</strong>. We'll call {data.phone} shortly to confirm.</p>
               <span className={`bk__status bk__status--${bookingStatus.toLowerCase()}`}>{displayStatus(bookingStatus)}</span>
-              <div className="bk__history"><strong>Session history</strong>{history.map((item) => <div className="bk__history-row" key={item.id}><span>{item.service}<small>{item.date} · {item.time}</small></span><b className={item.status === 'Confirmed' ? 'is-approved' : ''}>{displayStatus(item.status)}</b></div>)}</div>
+              <div className="bk__history"><div className="bk__history-head"><strong>Session history</strong><button onClick={() => downloadHistory(history)}>Download Excel</button></div>{history.map((item) => <div className="bk__history-row" key={item.id}><span>{item.service}<small>{item.date} · {item.time}</small></span><b className={item.status === 'Confirmed' ? 'is-approved' : ''}>{displayStatus(item.status)}</b></div>)}</div>
               <button className="btn btn--primary" onClick={onClose}>Done</button>
             </div>
           ) : (
@@ -179,7 +192,7 @@ export default function Booking({ open, onClose }) {
                 ))}
               </div>
 
-              {history.length > 0 && <div className="bk__history"><strong>Session history</strong>{history.map((item) => <div className="bk__history-row" key={item.id}><span>{item.service}<small>{item.date} · {item.time}</small></span><b className={item.status === 'Confirmed' ? 'is-approved' : ''}>{displayStatus(item.status)}</b></div>)}</div>}
+              {history.length > 0 && <div className="bk__history"><div className="bk__history-head"><strong>Session history</strong><button onClick={() => downloadHistory(history)}>Download Excel</button></div>{history.map((item) => <div className="bk__history-row" key={item.id}><span>{item.service}<small>{item.date} · {item.time}</small></span><b className={item.status === 'Confirmed' ? 'is-approved' : ''}>{displayStatus(item.status)}</b></div>)}</div>}
 
               {step === 1 && (
                 <div className="bk__step">

@@ -44,6 +44,15 @@ function isAuthorized(req) {
   return token && sessions.has(token)
 }
 
+function csvCell(value) {
+  return `"${String(value ?? '').replaceAll('"', '""')}"`
+}
+
+function bookingsCsv(items) {
+  const columns = ['id', 'status', 'service', 'date', 'time', 'name', 'phone', 'vehicle', 'notes', 'createdAt']
+  return [columns.join(','), ...items.map((booking) => columns.map((column) => csvCell(booking[column])).join(','))].join('\n')
+}
+
 app.post('/api/bookings', (req, res) => {
   const { service, date, time, name, phone, vehicle, notes = '' } = req.body || {}
   if (!service || !date || !time || !name || !phone || !vehicle) {
@@ -74,6 +83,13 @@ app.post('/api/admin/login', (req, res) => {
 app.get('/api/admin/bookings', (req, res) => {
   if (!isAuthorized(req)) return res.status(401).json({ message: 'Admin login required.' })
   res.json({ bookings })
+})
+
+app.get('/api/admin/bookings/export.csv', (req, res) => {
+  if (!isAuthorized(req)) return res.status(401).json({ message: 'Admin login required.' })
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+  res.setHeader('Content-Disposition', 'attachment; filename="auto-body-bookings.csv"')
+  res.send(`\uFEFF${bookingsCsv(bookings)}`)
 })
 
 app.patch('/api/admin/bookings/:id', (req, res) => {
