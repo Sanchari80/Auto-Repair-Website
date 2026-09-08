@@ -39,6 +39,8 @@ export default function Booking({ open, onClose }) {
   const [bookingId, setBookingId] = useState('')
   const [bookingStatus, setBookingStatus] = useState('New')
   const [history, setHistory] = useState([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const days = nextDays(6)
 
   useEffect(() => {
@@ -99,12 +101,18 @@ export default function Booking({ open, onClose }) {
     (step === 3 && data.name && data.phone && data.vehicle)
 
   const submit = async () => {
+    setSubmitError('')
+    setIsSubmitting(true)
     try {
+      const controller = new AbortController()
+      const timeout = window.setTimeout(() => controller.abort(), 10000)
       const response = await fetch(`${API_BASE}/api/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
+        signal: controller.signal,
       })
+      window.clearTimeout(timeout)
       if (!response.ok) throw new Error('Booking request failed')
       const result = await response.json()
       setBookingId(result.booking.id)
@@ -116,7 +124,9 @@ export default function Booking({ open, onClose }) {
       setDone(true)
     } catch {
       setDone(false)
-      window.alert('We could not send the request. Please call us at (425) 750-5164.')
+      setSubmitError('We could not connect to the booking service. Please call (425) 750-5164.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -234,7 +244,10 @@ export default function Booking({ open, onClose }) {
                 {step < 3 ? (
                   <button className="btn btn--primary" disabled={!canNext} onClick={() => setStep(step + 1)}>Continue</button>
                 ) : (
-                  <button className="btn btn--primary" disabled={!canNext} onClick={submit}>Request session</button>
+                  <div className="bk__submit-wrap">
+                    {submitError && <span className="bk__submit-error" role="alert">{submitError}</span>}
+                    <button className="btn btn--primary" disabled={!canNext || isSubmitting} onClick={submit}>{isSubmitting ? 'Sending...' : 'Request session'}</button>
+                  </div>
                 )}
               </div>
             </>

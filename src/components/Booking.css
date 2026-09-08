@@ -116,6 +116,8 @@
 .bk__fields textarea { resize: vertical; }
 
 .bk__nav { display: flex; justify-content: space-between; align-items: center; margin-top: 34px; }
+.bk__submit-wrap { display: grid; justify-items: end; gap: 8px; }
+.bk__submit-error { max-width: 280px; color: #ff8a3d; font-size: .75rem; text-align: right; }
 .bk__nav .btn:disabled { opacity: 0.4; pointer-events: none; }
 
 .bk__done { text-align: center; padding: 20px 0; }
