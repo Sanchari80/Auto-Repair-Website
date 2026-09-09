@@ -131,11 +131,12 @@
 .bk__history-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .bk__history-head strong { color: var(--steel-300); font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; }
 .bk__history-head button { color: var(--cool-1); font-size: .72rem; font-weight: 700; }
-.bk__history-row { display: flex; justify-content: space-between; gap: 16px; padding: 10px 12px; background: var(--graphite-900); border: 1px solid rgba(255,255,255,.08); border-radius: 3px; font-size: .85rem; }
+.bk__history-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; background: var(--graphite-900); border: 1px solid rgba(255,255,255,.08); border-radius: 3px; font-size: .85rem; }
 .bk__history-row span { display: grid; gap: 3px; min-width: 0; }
 .bk__history-row small { color: var(--steel-400); }
 .bk__history-row b { align-self: center; color: var(--amber-1); font-size: .72rem; text-transform: uppercase; }
 .bk__history-row b.is-approved { color: #75d69b; }
+.bk__history-delete { flex: none; color: #ff8a3d; font-size: .68rem; font-weight: 700; text-transform: uppercase; }
 
 @media (max-width: 780px) {
   .bk { padding: 12px; }

@@ -82,12 +82,12 @@
 
 @media (max-width: 900px) {
   .nav { background: rgba(10, 10, 12, 0.98); box-shadow: 0 1px 0 rgba(255,255,255,0.08); }
-  .nav__inner { height: 68px; }
+  .nav__inner { height: 56px; }
   .nav__phone { display: none; }
   .nav__burger { display: flex; }
   .nav__links {
     position: fixed;
-    top: 68px; left: 0; right: 0;
+    top: 56px; left: 0; right: 0;
     flex-direction: column;
     align-items: flex-start;
     gap: 22px;
@@ -112,5 +112,5 @@
   .nav__logo-text em { margin-left: 3px; }
   .nav__right { gap: 12px; }
   .nav__burger { width: 24px; }
-  .nav__inner { min-height: 68px; }
+  .nav__inner { min-height: 56px; }
 }

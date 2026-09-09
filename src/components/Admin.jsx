@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './Admin.css'
 import { subscribeToBookingEvents } from '../utils/bookingSocket.js'
 import { playNotificationSound } from '../utils/notificationSound.js'
+import Cursor from './Cursor.jsx'
 
 const statuses = ['New', 'Contacted', 'Confirmed', 'Completed']
 const API_BASE = import.meta.env.VITE_API_URL || 'https://auto-repair-website.onrender.com'
@@ -102,7 +103,7 @@ export default function Admin() {
   }
 
   if (!token) return (
-    <main className="admin-page admin-page--login">
+    <><Cursor /><main className="admin-page admin-page--login">
       <form className="admin-login" onSubmit={login}>
         <a href="/" className="admin-login__brand">AUTO BODY REPAIR <em>INC.</em></a>
         <span className="eyebrow">Private access</span>
@@ -113,11 +114,11 @@ export default function Admin() {
         <button className="btn btn--primary" type="submit" disabled={isLoggingIn}>{isLoggingIn ? 'Connecting...' : 'Open bookings'}</button>
         <a href="/" className="admin-back">Back to website</a>
       </form>
-    </main>
+    </main></>
   )
 
   return (
-    <main className="admin-page">
+    <><Cursor /><main className="admin-page">
       <header className="admin-topbar"><a href="/" className="admin-login__brand">AUTO BODY REPAIR <em>INC.</em></a><div><span>Admin panel</span><button onClick={() => { sessionStorage.removeItem('abr_admin_token'); setToken('') }}>Sign out</button></div></header>
       <div className="admin-shell">
         <div className="admin-heading"><div><span className="eyebrow">Operations desk</span><h1>Session bookings</h1><p>Incoming customer requests and appointment details.</p></div><div className="admin-heading__actions"><button className="admin-export" onClick={exportBookings}>Download Excel</button><button className="admin-refresh" onClick={() => loadBookings()}>Refresh</button></div></div>
@@ -128,6 +129,6 @@ export default function Admin() {
           {selected && <aside className="admin-detail"><div className="admin-detail__top"><span>Request details</span><button onClick={() => setSelected(null)}>×</button></div><h2>{selected.name}</h2><a href={`tel:${selected.phone}`}>{selected.phone}</a><dl><div><dt>Service</dt><dd>{selected.service}</dd></div><div><dt>Appointment</dt><dd>{selected.date} at {selected.time}</dd></div><div><dt>Vehicle</dt><dd>{selected.vehicle}</dd></div><div><dt>Notes</dt><dd>{selected.notes || 'No notes provided'}</dd></div></dl><label>Status<select value={selected.status} onChange={(event) => updateStatus(selected.id, event.target.value)}>{statuses.map((status) => <option key={status}>{status}</option>)}</select></label><button className="admin-delete" onClick={() => removeBooking(selected.id)}>Delete request</button></aside>}
         </div>
       </div>
-    </main>
+    </main></>
   )
 }

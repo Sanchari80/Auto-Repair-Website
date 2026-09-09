@@ -13,6 +13,8 @@ import { subscribeToBookingEvents } from './utils/bookingSocket.js'
 
 const HISTORY_KEY = 'abr_session_history'
 
+const isCompleted = (item) => String(item.status).toLowerCase() === 'completed'
+
 export default function App() {
   const [loaded, setLoaded] = useState(false)
   const [booking, setBooking] = useState(false)
@@ -22,17 +24,24 @@ export default function App() {
     const readHistory = () => {
       try {
         const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]')
-        setActiveBooking(history.find((item) => item.status !== 'Completed') || null)
+        setActiveBooking(history.find((item) => !isCompleted(item)) || null)
       } catch { setActiveBooking(null) }
     }
     readHistory()
-    return subscribeToBookingEvents((event) => {
+    window.addEventListener('booking-history-changed', readHistory)
+    window.addEventListener('storage', readHistory)
+    const unsubscribe = subscribeToBookingEvents((event) => {
       if (event.type !== 'booking.updated') return
       const current = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]')
       const next = current.map((item) => item.id === event.booking.id ? { ...item, status: event.booking.status } : item)
       localStorage.setItem(HISTORY_KEY, JSON.stringify(next))
-      setActiveBooking(next.find((item) => item.status !== 'Completed') || null)
+      setActiveBooking(next.find((item) => !isCompleted(item)) || null)
     })
+    return () => {
+      unsubscribe()
+      window.removeEventListener('booking-history-changed', readHistory)
+      window.removeEventListener('storage', readHistory)
+    }
   }, [])
 
   return (

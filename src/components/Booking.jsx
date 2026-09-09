@@ -33,6 +33,10 @@ function displayStatus(status) {
   return status === 'New' ? 'Requested' : status
 }
 
+function notifyHistoryChanged() {
+  window.dispatchEvent(new Event('booking-history-changed'))
+}
+
 function downloadHistory(items) {
   const columns = ['id', 'status', 'service', 'date', 'time', 'name', 'phone', 'vehicle', 'notes']
   const cell = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`
@@ -88,6 +92,7 @@ export default function Booking({ open, onClose }) {
       }))
       setHistory(nextHistory)
       localStorage.setItem(HISTORY_KEY, JSON.stringify(nextHistory))
+      notifyHistoryChanged()
       const current = nextHistory.find((item) => item.id === bookingId)
       if (current) setBookingStatus(current.status)
     }
@@ -102,6 +107,7 @@ export default function Booking({ open, onClose }) {
     setHistory((current) => {
       const next = current.map((item) => item.id === event.booking.id ? { ...item, status: event.booking.status } : item)
       localStorage.setItem(HISTORY_KEY, JSON.stringify(next))
+      notifyHistoryChanged()
       return next
     })
     if (event.booking.id === bookingId) setBookingStatus(event.booking.status)
@@ -137,6 +143,7 @@ export default function Booking({ open, onClose }) {
       const nextHistory = [record, ...history.filter((item) => item.id !== record.id)]
       setHistory(nextHistory)
       localStorage.setItem(HISTORY_KEY, JSON.stringify(nextHistory))
+      notifyHistoryChanged()
       setDone(true)
     } catch {
       setDone(false)
@@ -145,6 +152,20 @@ export default function Booking({ open, onClose }) {
       setIsSubmitting(false)
     }
   }
+
+  const removeHistoryItem = (id) => {
+    const nextHistory = history.filter((item) => item.id !== id)
+    setHistory(nextHistory)
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(nextHistory))
+    notifyHistoryChanged()
+    if (id === bookingId) {
+      setBookingId('')
+      setDone(false)
+      setBookingStatus('New')
+    }
+  }
+
+  const renderHistory = () => <div className="bk__history"><div className="bk__history-head"><strong>Session history</strong><button onClick={() => downloadHistory(history)}>Download Excel</button></div>{history.map((item) => <div className="bk__history-row" key={item.id}><span>{item.service}<small>{item.date} · {item.time}</small></span><b className={item.status === 'Confirmed' ? 'is-approved' : ''}>{displayStatus(item.status)}</b><button className="bk__history-delete" onClick={() => removeHistoryItem(item.id)} aria-label={`Delete ${item.service} booking`}>Delete</button></div>)}</div>
 
   const fmtDate = (d) =>
     d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
@@ -181,7 +202,7 @@ export default function Booking({ open, onClose }) {
               <h3>{bookingStatus === 'Confirmed' ? 'Booking confirmed' : 'Session requested'}</h3>
               <p>Thanks, {data.name.split(' ')[0] || 'there'}. We've noted your <strong>{data.service}</strong> for <strong>{data.date}</strong> at <strong>{data.time}</strong>. We'll call {data.phone} shortly to confirm.</p>
               <span className={`bk__status bk__status--${bookingStatus.toLowerCase()}`}>{displayStatus(bookingStatus)}</span>
-              <div className="bk__history"><div className="bk__history-head"><strong>Session history</strong><button onClick={() => downloadHistory(history)}>Download Excel</button></div>{history.map((item) => <div className="bk__history-row" key={item.id}><span>{item.service}<small>{item.date} · {item.time}</small></span><b className={item.status === 'Confirmed' ? 'is-approved' : ''}>{displayStatus(item.status)}</b></div>)}</div>
+              {history.length > 0 && renderHistory()}
               <button className="btn btn--primary" onClick={onClose}>Done</button>
             </div>
           ) : (
@@ -192,7 +213,7 @@ export default function Booking({ open, onClose }) {
                 ))}
               </div>
 
-              {history.length > 0 && <div className="bk__history"><div className="bk__history-head"><strong>Session history</strong><button onClick={() => downloadHistory(history)}>Download Excel</button></div>{history.map((item) => <div className="bk__history-row" key={item.id}><span>{item.service}<small>{item.date} · {item.time}</small></span><b className={item.status === 'Confirmed' ? 'is-approved' : ''}>{displayStatus(item.status)}</b></div>)}</div>}
+              {history.length > 0 && renderHistory()}
 
               {step === 1 && (
                 <div className="bk__step">
