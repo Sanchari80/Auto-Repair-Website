@@ -7,6 +7,8 @@ import Process from './components/Process.jsx'
 import Gallery from './components/Gallery.jsx'
 import Contact from './components/Contact.jsx'
 import Booking from './components/Booking.jsx'
+import Reviews from './components/Reviews.jsx'
+import Cursor from './components/Cursor.jsx'
 import { subscribeToBookingEvents } from './utils/bookingSocket.js'
 
 const HISTORY_KEY = 'abr_session_history'
@@ -37,12 +39,14 @@ export default function App() {
     <>
       {!loaded && <Loader onDone={() => setLoaded(true)} />}
       <Navbar onBook={() => setBooking(true)} />
+      <Cursor />
       {activeBooking && <div className={`user-status user-status--${activeBooking.status.toLowerCase()}`}><span className="user-status__pulse" /><span><strong>Session {activeBooking.status === 'New' ? 'booked' : activeBooking.status.toLowerCase()}</strong><small>{activeBooking.service} · {activeBooking.date} at {activeBooking.time}</small></span><button onClick={() => setBooking(true)}>View</button></div>}
       <main>
         <Hero onBook={() => setBooking(true)} ready={loaded} />
         <Services />
         <Process />
         <Gallery />
+        <Reviews />
         <Contact onBook={() => setBooking(true)} />
       </main>
       <Booking open={booking} onClose={() => setBooking(false)} />
