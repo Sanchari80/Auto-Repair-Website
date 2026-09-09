@@ -25,6 +25,11 @@ export default function Cursor() {
     loop()
 
     const setHover = (on) => ring.classList.toggle('hovering', on)
+    const onDown = () => {
+      ring.classList.remove('clicking')
+      requestAnimationFrame(() => ring.classList.add('clicking'))
+    }
+    const onUp = () => ring.classList.remove('clicking')
     const over = (e) => {
       if (e.target.closest('a, button, input, textarea, select, .clickable')) setHover(true)
     }
@@ -33,11 +38,15 @@ export default function Cursor() {
     }
 
     window.addEventListener('mousemove', onMove)
+    window.addEventListener('mousedown', onDown)
+    window.addEventListener('mouseup', onUp)
     document.addEventListener('mouseover', over)
     document.addEventListener('mouseout', out)
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('mouseup', onUp)
       document.removeEventListener('mouseover', over)
       document.removeEventListener('mouseout', out)
     }
@@ -47,11 +56,10 @@ export default function Cursor() {
     <>
       <div className="cursor-dot" ref={dotRef} />
       <div className="cursor-ring" ref={ringRef} aria-hidden="true">
-        <svg viewBox="0 0 32 96" fill="none">
-          <path d="M8 7 L16 2 L24 7 V20 L16 25 L8 20 Z" fill="#15151a" stroke="#ff5a1f" strokeWidth="2"/>
-          <path d="M16 25 V80" stroke="#9aa0ab" strokeWidth="4" strokeLinecap="round"/>
-          <path d="M16 25 V80" stroke="#35c0d8" strokeWidth="1" strokeDasharray="3 4"/>
-          <path d="M10 80 H22 L16 94 Z" fill="#f5c518" stroke="#ff8a3d" strokeWidth="1.5"/>
+        <svg viewBox="0 0 64 64" fill="none">
+          <path d="M38 8a16 16 0 0 0-7 28L12 55a5 5 0 0 0 7 7l19-19a16 16 0 0 0 19-22l-10 10-7-2-2-7L48 12a16 16 0 0 0-10-4Z" fill="#708995" stroke="#b8c6ca" strokeWidth="2" strokeLinejoin="round"/>
+          <path d="m17 55 22-22" stroke="#435b66" strokeWidth="4" strokeLinecap="round"/>
+          <path d="m35 13 7 7" stroke="#435b66" strokeWidth="2" strokeLinecap="round"/>
         </svg>
       </div>
     </>
