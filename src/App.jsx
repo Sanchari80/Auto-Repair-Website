@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Loader from './components/Loader.jsx'
 import Navbar from './components/Navbar.jsx'
 import Hero from './components/Hero.jsx'
@@ -19,6 +19,8 @@ export default function App() {
   const [loaded, setLoaded] = useState(false)
   const [booking, setBooking] = useState(false)
   const [activeBooking, setActiveBooking] = useState(null)
+  const [statusOffset, setStatusOffset] = useState({ x: 0, y: 0 })
+  const statusDrag = useRef(null)
 
   useEffect(() => {
     const readHistory = () => {
@@ -44,12 +46,36 @@ export default function App() {
     }
   }, [])
 
+  const startStatusDrag = (event) => {
+    statusDrag.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      offsetX: statusOffset.x,
+      offsetY: statusOffset.y,
+    }
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+
+  const moveStatusCard = (event) => {
+    const drag = statusDrag.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+    setStatusOffset({
+      x: drag.offsetX + event.clientX - drag.startX,
+      y: drag.offsetY + event.clientY - drag.startY,
+    })
+  }
+
+  const stopStatusDrag = () => {
+    statusDrag.current = null
+  }
+
   return (
     <>
       {!loaded && <Loader onDone={() => setLoaded(true)} />}
       <Navbar onBook={() => setBooking(true)} />
       <Cursor />
-      {activeBooking && <div className={`user-status user-status--${activeBooking.status.toLowerCase()}`}><span className="user-status__pulse" /><span><strong>Session {activeBooking.status === 'New' ? 'booked' : activeBooking.status.toLowerCase()}</strong><small>{activeBooking.service} · {activeBooking.date} at {activeBooking.time}</small></span><button onClick={() => setBooking(true)}>View</button></div>}
+      {activeBooking && <div className={`user-status user-status--${activeBooking.status.toLowerCase()}`} style={{ transform: `translate(${statusOffset.x}px, ${statusOffset.y}px)` }} onPointerDown={startStatusDrag} onPointerMove={moveStatusCard} onPointerUp={stopStatusDrag} onPointerCancel={stopStatusDrag}><span className="user-status__pulse" /><span><strong>Session {activeBooking.status === 'New' ? 'booked' : activeBooking.status.toLowerCase()}</strong><small>{activeBooking.service} · {activeBooking.date} at {activeBooking.time}</small></span><button onClick={() => setBooking(true)}>View</button></div>}
       <main>
         <Hero onBook={() => setBooking(true)} ready={loaded} />
         <Services />

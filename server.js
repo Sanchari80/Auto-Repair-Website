@@ -1,6 +1,7 @@
 import express from 'express'
 import http from 'node:http'
 import path from 'node:path'
+import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import crypto from 'node:crypto'
 import { WebSocketServer } from 'ws'
@@ -11,7 +12,25 @@ const port = process.env.PORT || 3001
 const adminPassword = process.env.ADMIN_PASSWORD || 'repair-admin-2026'
 const frontendOrigin = (process.env.FRONTEND_ORIGIN || '*').replace(/\/$/, '')
 const sessions = new Map()
-const bookings = []
+const bookingsFile = path.join(__dirname, 'data', 'bookings.json')
+fs.mkdirSync(path.dirname(bookingsFile), { recursive: true })
+
+function loadBookings() {
+  try {
+    const saved = JSON.parse(fs.readFileSync(bookingsFile, 'utf8'))
+    return Array.isArray(saved) ? saved : []
+  } catch {
+    return []
+  }
+}
+
+function saveBookings() {
+  const temporaryFile = `${bookingsFile}.tmp`
+  fs.writeFileSync(temporaryFile, `${JSON.stringify(bookings, null, 2)}\n`, 'utf8')
+  fs.renameSync(temporaryFile, bookingsFile)
+}
+
+const bookings = loadBookings()
 const server = http.createServer(app)
 const webSocketServer = new WebSocketServer({ noServer: true })
 
@@ -63,6 +82,7 @@ app.post('/api/bookings', (req, res) => {
     status: 'New', createdAt: new Date().toISOString(),
   }
   bookings.unshift(booking)
+  saveBookings()
   broadcast({ type: 'booking.created', booking })
   res.status(201).json({ booking: { id: booking.id, status: booking.status } })
 })
@@ -97,6 +117,7 @@ app.patch('/api/admin/bookings/:id', (req, res) => {
   const booking = bookings.find((item) => item.id === req.params.id)
   if (!booking) return res.status(404).json({ message: 'Booking not found.' })
   if (['New', 'Contacted', 'Confirmed', 'Completed'].includes(req.body?.status)) booking.status = req.body.status
+  saveBookings()
   broadcast({ type: 'booking.updated', booking })
   res.json({ booking })
 })
@@ -106,6 +127,7 @@ app.delete('/api/admin/bookings/:id', (req, res) => {
   const index = bookings.findIndex((item) => item.id === req.params.id)
   if (index === -1) return res.status(404).json({ message: 'Booking not found.' })
   bookings.splice(index, 1)
+  saveBookings()
   broadcast({ type: 'booking.deleted', bookingId: req.params.id })
   res.status(204).end()
 })
