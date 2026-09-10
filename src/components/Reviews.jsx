@@ -1,28 +1,19 @@
 import { useEffect, useState } from 'react'
 import './Reviews.css'
+import { readReviews, saveReviews } from '../utils/storage.js'
 
-const REVIEWS_KEY = 'abr_customer_reviews'
 const DEMO_REVIEWS = [
   { id: 'demo-1', number: 1, name: 'Marcus T.', address: 'Everett, WA', text: 'They brought my rear bumper back to factory shape. The finish is flawless and the handoff was right on time.' },
   { id: 'demo-2', number: 2, name: 'Nina R.', address: 'Lynnwood, WA', text: 'Clear updates, honest pricing, and a paint match you cannot tell from the original panel.' },
   { id: 'demo-3', number: 3, name: 'Daniel K.', address: 'Mukilteo, WA', text: 'Professional from inspection to pickup. My car looks better than it did before the accident.' },
 ]
 
-function readReviews() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(REVIEWS_KEY) || 'null')
-    return Array.isArray(saved) && saved.length ? saved : DEMO_REVIEWS
-  } catch {
-    return DEMO_REVIEWS
-  }
-}
-
 export default function Reviews() {
   const [reviews, setReviews] = useState(DEMO_REVIEWS)
   const [form, setForm] = useState({ name: '', address: '', text: '' })
 
   useEffect(() => {
-    setReviews(readReviews())
+    readReviews(DEMO_REVIEWS).then(setReviews)
   }, [])
 
   const submitReview = (event) => {
@@ -41,7 +32,7 @@ export default function Reviews() {
     }
     const nextReviews = [...reviews, nextReview]
     setReviews(nextReviews)
-    localStorage.setItem(REVIEWS_KEY, JSON.stringify(nextReviews))
+    saveReviews(nextReviews)
     setForm({ name: '', address: '', text: '' })
   }
 

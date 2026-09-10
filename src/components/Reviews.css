@@ -5,11 +5,11 @@
 }
 .reviews__head { margin-bottom: 42px; }
 .reviews__layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, .75fr); gap: clamp(28px, 6vw, 84px); align-items: start; }
-.reviews__list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.reviews__list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; min-width: 0; }
 .review-plate {
   min-height: 218px; padding: 18px; color: #141518; background: #d9dde0;
   border: 6px solid #aab0b4; border-radius: 8px; box-shadow: 0 12px 25px rgba(0,0,0,.25), inset 0 0 0 2px rgba(255,255,255,.5);
-  transform: rotate(-1deg); transition: transform .25s var(--ease-out), border-color .25s;
+  min-width: 0; overflow-wrap: anywhere; transform: rotate(-1deg); transition: transform .25s var(--ease-out), border-color .25s;
 }
 .review-plate:nth-child(2) { transform: rotate(1.2deg); background: #e7e8df; }
 .review-plate:nth-child(3) { transform: rotate(-.4deg); background: #d6e0e2; }

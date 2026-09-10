@@ -2,22 +2,12 @@ import { useEffect, useState } from 'react'
 import './Booking.css'
 import { subscribeToBookingEvents } from '../utils/bookingSocket.js'
 import { playNotificationSound } from '../utils/notificationSound.js'
+import { readBookings, saveBookings } from '../utils/storage.js'
 
 const SERVICES = ['Collision Repair', 'Paint & Refinish', 'Dent & Scratch', 'Detailing & Ceramic', 'Glass Replacement', 'Free Estimate']
 const TIMES = ['8:00 AM', '9:30 AM', '11:00 AM', '1:00 PM', '2:30 PM', '4:00 PM']
 const HISTORY_KEY = 'abr_session_history'
 const API_BASE = import.meta.env.VITE_API_URL || 'https://auto-repair-website.onrender.com'
-
-function getSavedHistory() {
-  try {
-    const current = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]')
-    if (current.length) return current
-    const legacy = JSON.parse(localStorage.getItem('abr_bookings') || '[]')
-    return legacy.map((item, index) => ({ ...item, id: item.id || `legacy-${index}`, status: item.status || 'New' }))
-  } catch {
-    return []
-  }
-}
 
 function nextDays(count) {
   const out = []
@@ -65,7 +55,7 @@ export default function Booking({ open, onClose }) {
     if (open) {
       setStep(1); setDone(false)
       setBookingId(''); setBookingStatus('New')
-      setHistory(getSavedHistory())
+      readBookings().then(setHistory)
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
@@ -91,7 +81,7 @@ export default function Booking({ open, onClose }) {
         } catch { return item }
       }))
       setHistory(nextHistory)
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(nextHistory))
+      saveBookings(nextHistory)
       notifyHistoryChanged()
       const current = nextHistory.find((item) => item.id === bookingId)
       if (current) setBookingStatus(current.status)
@@ -106,7 +96,7 @@ export default function Booking({ open, onClose }) {
     if (event.booking.status === 'Confirmed') playNotificationSound('confirmed')
     setHistory((current) => {
       const next = current.map((item) => item.id === event.booking.id ? { ...item, status: event.booking.status } : item)
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(next))
+      saveBookings(next)
       notifyHistoryChanged()
       return next
     })
@@ -142,7 +132,7 @@ export default function Booking({ open, onClose }) {
       const record = { ...data, id: result.booking.id, status: result.booking.status }
       const nextHistory = [record, ...history.filter((item) => item.id !== record.id)]
       setHistory(nextHistory)
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(nextHistory))
+      saveBookings(nextHistory)
       notifyHistoryChanged()
       setDone(true)
     } catch {
@@ -156,7 +146,7 @@ export default function Booking({ open, onClose }) {
   const removeHistoryItem = (id) => {
     const nextHistory = history.filter((item) => item.id !== id)
     setHistory(nextHistory)
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(nextHistory))
+    saveBookings(nextHistory)
     notifyHistoryChanged()
     if (id === bookingId) {
       setBookingId('')

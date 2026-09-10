@@ -10,6 +10,7 @@ import Booking from './components/Booking.jsx'
 import Reviews from './components/Reviews.jsx'
 import Cursor from './components/Cursor.jsx'
 import { subscribeToBookingEvents } from './utils/bookingSocket.js'
+import { readBookings, saveBookings } from './utils/storage.js'
 
 const HISTORY_KEY = 'abr_session_history'
 
@@ -23,20 +24,20 @@ export default function App() {
   const statusDrag = useRef(null)
 
   useEffect(() => {
-    const readHistory = () => {
+    const readHistory = async () => {
       try {
-        const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]')
+        const history = await readBookings()
         setActiveBooking(history.find((item) => !isCompleted(item)) || null)
       } catch { setActiveBooking(null) }
     }
     readHistory()
     window.addEventListener('booking-history-changed', readHistory)
     window.addEventListener('storage', readHistory)
-    const unsubscribe = subscribeToBookingEvents((event) => {
+    const unsubscribe = subscribeToBookingEvents(async (event) => {
       if (event.type !== 'booking.updated') return
-      const current = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]')
+      const current = await readBookings()
       const next = current.map((item) => item.id === event.booking.id ? { ...item, status: event.booking.status } : item)
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(next))
+      await saveBookings(next)
       setActiveBooking(next.find((item) => !isCompleted(item)) || null)
     })
     return () => {

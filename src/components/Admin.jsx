@@ -3,6 +3,7 @@ import './Admin.css'
 import { subscribeToBookingEvents } from '../utils/bookingSocket.js'
 import { playNotificationSound } from '../utils/notificationSound.js'
 import Cursor from './Cursor.jsx'
+import { saveBookings } from '../utils/storage.js'
 
 const statuses = ['New', 'Contacted', 'Confirmed', 'Completed']
 const API_BASE = import.meta.env.VITE_API_URL || 'https://auto-repair-website.onrender.com'
@@ -26,6 +27,7 @@ export default function Admin() {
     if (!response.ok) throw new Error('Could not load bookings.')
     const data = await response.json()
     setBookings(data.bookings)
+    await saveBookings(data.bookings)
     setSelected((current) => current ? data.bookings.find((booking) => booking.id === current.id) || null : null)
   }
 

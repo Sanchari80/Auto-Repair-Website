@@ -119,11 +119,11 @@ export default function Loader({ onDone }) {
         clearInterval(interval)
         setTimeout(() => {
           setHiding(true)
-          setTimeout(() => onDone && onDone(), 700)
-        }, 500)
+          setTimeout(() => onDone && onDone(), 350)
+        }, 250)
       }
       setProgress(Math.floor(pct))
-    }, 220)
+    }, 110)
 
     return () => {
       clearInterval(interval)
