@@ -111,22 +111,27 @@ export default function Loader({ onDone }) {
     }
     window.addEventListener('resize', onResize)
 
-    let pct = 0
-    const interval = setInterval(() => {
-      pct += Math.random() * 12 + 4
-      if (pct >= 100) {
-        pct = 100
-        clearInterval(interval)
-        setTimeout(() => {
-          setHiding(true)
-          setTimeout(() => onDone && onDone(), 350)
-        }, 250)
+    const startedAt = performance.now()
+    let finishTimer
+    let rafProgress
+    const animateProgress = (now) => {
+      const elapsed = now - startedAt
+      const pct = Math.min(100, Math.round((elapsed / 450) * 100))
+      setProgress(pct)
+      if (pct < 100) {
+        rafProgress = requestAnimationFrame(animateProgress)
+        return
       }
-      setProgress(Math.floor(pct))
-    }, 110)
+      finishTimer = window.setTimeout(() => {
+        setHiding(true)
+        finishTimer = window.setTimeout(() => onDone && onDone(), 200)
+      }, 100)
+    }
+    rafProgress = requestAnimationFrame(animateProgress)
 
     return () => {
-      clearInterval(interval)
+      cancelAnimationFrame(rafProgress)
+      clearTimeout(finishTimer)
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', onResize)
       steeringWheel.traverse((object) => {
